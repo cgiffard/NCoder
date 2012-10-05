@@ -1,0 +1,28 @@
+{
+  "name": "NCoder",
+  "version": "0.0.1",
+  "description": "Simple node wrapper for ffmpeg.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cgiffard/NCoder.git"
+  },
+  "keywords": [
+    "ffmpeg",
+    "encoder",
+    "video",
+    "audio",
+    "h264",
+    "mp3",
+    "ogg",
+    "ogv",
+    "theora",
+    "webm",
+    "vorbis"
+  ],
+  "author": "Christopher Giffard",
+  "license": "BSD"
+}
