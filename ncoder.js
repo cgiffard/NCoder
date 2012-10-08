@@ -31,16 +31,17 @@ NCoder.prototype.metadata = function(infile) {
 	// then read it back in...
 	var ffmpeg = spawn("ffmpeg",["-i",infile]);
 	
-	var stdout = "", stderr = "",
-		parser = new FFParser(ffmpeg.stdout,ffmpeg.sterr);
+	var parser = new FFParser(ffmpeg);
 	
 	ffmpeg.stderr.on("data",function(streamChunk) {
-		stderr += streamChunk
+		//stderr += streamChunk
 	});
 	
 	ffmpeg.on("exit",function(arguments) {
-		parser.parse(stderr);
-	})
+		//parser.parse(stderr);
+		console.log("that's the end of that then.");
+		console.log(parser);
+	});
 };
 
 module.exports = NCoder;
