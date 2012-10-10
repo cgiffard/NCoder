@@ -25,7 +25,7 @@ NCoder.prototype.addJob = function(params) {
 
 
 /* Some convenient functions to wrap a bit of what ffmpeg can do... */
-NCoder.prototype.metadata = function(infile) {
+NCoder.prototype.metadata = function(infile,callback) {
 	// Deliberately ignore proper ffmpeg usage - just to get metadata out.
 	// Otherwise we have to write to disk in some arcane ini format and
 	// then read it back in...
@@ -39,8 +39,13 @@ NCoder.prototype.metadata = function(infile) {
 	
 	ffmpeg.on("exit",function(arguments) {
 		//parser.parse(stderr);
-		console.log("that's the end of that then.");
-		console.log(parser);
+		//console.log("that's the end of that then.");
+		//console.log(parser);
+	});
+	
+	parser.on("parsecomplete",function() {
+		parser.inputs.forEach(function(item) {
+			console.log(item)});
 	});
 };
 
