@@ -1,5 +1,5 @@
 // Little parser for FFMpeg
-
+var fs = require("fs");
 var EventEmitter = require("events").EventEmitter;
 
 const	FF_UNINITIALISED	= 0,
@@ -10,7 +10,10 @@ const	FF_UNINITIALISED	= 0,
 		FF_STREAMWAITING	= 5,
 		FF_STREAMINFO		= 6,
 		FF_STREAMMETA		= 7,
-		FF_STREAMDURATION	= 8;
+		FF_STREAMDURATION	= 8,
+		FF_OUTPUTWAITING	= 9,
+		FF_STREAMMAPPING	= 10,
+		FF_PROGRESS			= 11;
 
 // My build of ffmpeg outputs two space tabs. Yours may differ.
 const	FF_INDENT_TOKEN		= "  ";
@@ -26,6 +29,7 @@ var FFParser = function(ffchild) {
 	self.status		= 0;
 	
 	// Managing the parser!
+	self._debugLines	= [];
 	self._outputBuffer	= "";
 	self._outputLines	= [];
 	self._lineIndex		= 0;
@@ -36,7 +40,7 @@ var FFParser = function(ffchild) {
 	self._previousIndentation = 0;
 	
 	ffchild.stderr.on("data",self.parse.bind(self));
-	ffchild.stdout.on("data",self.parse.bind(self));
+	// ffchild.stdout.on("data",self.parse.bind(self));
 	
 	ffchild.stderr.on("end",function() {
 		if (self._outputBuffer.length) {
@@ -73,8 +77,6 @@ FFParser.prototype.parse = function(data) {
 		endsWithNewline	= data.match(/[\r\n]$/),
 		lines			= data.split(/[\r\n]/ig);
 	
-	self.emit("chunkparse",data);
-	
 	// If there's something in the output buffer, prepend it to the first line.
 	if (self._outputBuffer.length) {
 		lines[0] = self._outputBuffer + lines[0];
@@ -102,8 +104,20 @@ FFParser.prototype.parse = function(data) {
 
 FFParser.prototype.parseLine = function(lineData) {
 	var self = this;
+	var origData = lineData;
 	
 	self.emit("lineparse",lineData);
+	
+	// Is this a debug message?
+	if (lineData.match(/^\s*\[[a-z0-9\-\_]+\s*\@\s*0x[a-f0-9]+\]/ig)) {
+		self.emit("debug",lineData)
+		self._debugLines.push(lineData);
+		return;
+	}
+	
+	if (lineData.match(/^\s*Output\s*#\d+,/i)) {
+		self.status = FF_OUTPUTWAITING;
+	}
 	
 	// Check this isn't a junky error message
 	if (lineData.match(/At least one/i)) return;
@@ -118,7 +132,7 @@ FFParser.prototype.parseLine = function(lineData) {
 	}
 	
 	var procedureData, procedureName = "";
-	if ((procedureData = lineData.match(/^([a-z0-9\-_]+)\s*\:*/i)) &&
+	if ((procedureData = lineData.match(/^([a-z0-9\-_]+)\s*\:*.+/i)) &&
 							lineData.match(/\:/g)) {
 		
 		procedureName = procedureData[1];
@@ -160,10 +174,16 @@ FFParser.prototype.parseLine = function(lineData) {
 				);
 				
 				self.status = FF_METAWAITING;
+			
+			} else if (lineData.match(/^\s*lib[a-z0-9]+/)) {
+				
+				// Whoops, still in the build info block.
+				self.status = FF_BUILDINFO;
 				
 			} else {
-				
-				throw new Error("Unrecognised procedure name.");
+				console.log("UNEXPECTED ERROR",self.status);
+				console.log(origData);
+				return;
 			}
 			
 			break;
@@ -176,7 +196,9 @@ FFParser.prototype.parseLine = function(lineData) {
 			// If we've got an unexpected procedure name and the line isn't blank
 			} else if ((procedureName+lineData).replace(/\s+/ig,"").length) {
 				
-				throw new Error("Failed to init metablock");
+				console.log("UNEXPECTED ERROR",self.status);
+				console.log(origData);
+				return;
 			}
 			
 			break;
@@ -205,10 +227,10 @@ FFParser.prototype.parseLine = function(lineData) {
 				self.status = FF_STREAMINFO;
 			
 			// If we've got an unexpected procedure name and the line isn't blank
-			} else if ((procedureName+lineData).replace(/\s+/ig,"").length) {
-				
-				console.log(procedureName,lineData);
-				throw new Error("Unrecognised procedure name.");
+			} else if ((procedureName+lineData).replace(/\s+/g,"").length) {
+				console.log("UNEXPECTED ERROR",self.status);
+				console.log(origData);
+				return;
 			}
 			
 			break;
@@ -220,8 +242,9 @@ FFParser.prototype.parseLine = function(lineData) {
 			
 			// If we've got an unexpected procedure name and the line isn't blank
 			} else if ((procedureName+lineData).replace(/\s+/ig,"").length) {
-				
-				throw new Error("Failed to init metablock");
+				console.log("UNEXPECTED ERROR",self.status);
+				console.log(origData);
+				return;
 			}
 			
 			break;
@@ -232,6 +255,11 @@ FFParser.prototype.parseLine = function(lineData) {
 			
 			self._currentStream.metadata[procedureName] =
 				trim(lineData.replace(/^\s*:/g,""));
+			
+			break;
+			
+		case FF_OUTPUTWAITING:
+			
 			
 			break;
 			
@@ -301,6 +329,7 @@ FFInput.prototype.processDurationString = function(duration) {
 	duration = 0;
 	
 	durationParts.reverse().forEach(function(part,index) {
+		part = part.replace(/[^\d\.]/ig,"");
 		duration += parseFloat(part) * (index ? Math.pow(60,index) : 1);
 	});
 	
@@ -327,6 +356,11 @@ function FFStream(initData) {
 	
 	var initParts =
 		initData.match(/\s*#\d:(\d+)(\(([a-zA-Z\-]+)\))\:\s*(Video|Audio)\s*:\s*(.*)/);
+	
+	if (!initParts) {
+		console.log(initData);
+		throw new Error("Invalid stream initialisation string!");
+	}
 	
 	var streamDetail = [].slice.call(initParts,0).pop(),
 		streamDetailParts = streamDetail.split(/,\s+/g);
