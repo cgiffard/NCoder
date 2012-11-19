@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var NCoder = require("./"),
+var NCoder = require("../"),
 	ProgressBar = require('progress'),
 	myEnc = new NCoder(),
 	progressBar = new ProgressBar('Encoding [:bar] :percent :elapseds elapsed/:etas remaining', { total: 1000, width: 50 });
@@ -9,26 +9,35 @@ var NCoder = require("./"),
 var myFile = "/Users/cgiffard/Development/Projects/Vixen/30707792.mp4",
 	myOutput = "./out.mp4";
 
-var job = myEnc.h264(myFile,myOutput,{"videoWidth":640,"videoHeight":360,"videoBitRate":"1000k"});
+var job =
+	myEnc.mp4(
+		myFile,
+		myOutput,
+		{
+			"videoWidth":640,
+			"videoHeight":360,
+			"videoBitRate":"1024k",
+			"audioBitRate":"128k"
+		});
 
 var previousPerc = 0;
 job.on("progress",function(data) {
-	if ((data.percentComplete*10|0) > previousPerc) {
+	floorPerc = Math.floor(data.percentComplete*10);
+
+	while (floorPerc > previousPerc) {
 		progressBar.tick();
-		previousPerc = data.percentComplete*10|0;
-		
-		console.log(data.percentComplete);
+		previousPerc ++;
 	}
-})
+});
 
-job.run();
-
-job.on("complete",function(data) {
-	console.log("\nJob complete. Looks like we beat the death timer.");
+job.on("error",function(message,code) {
+	console.log("Died:",message);
 	process.exit(0);
 });
 
-// setTimeout(function() {
-// 	job.stop();
-// 	process.exit(0);
-// },100000);
+job.on("complete",function(data) {
+	console.log("\nJob complete.");
+	process.exit(0);
+});
+
+job.run();

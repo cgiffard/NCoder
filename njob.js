@@ -56,7 +56,6 @@ var NJob = function NJob(input,output,parameters) {
 		
 		self.duration = duration;
 		self.fps = fps;
-		console.log("found duration and fps",duration,fps);
 	});
 };
 
@@ -88,6 +87,7 @@ NJob.prototype.run = function() {
 	var buffer = "";
 	ffmpeg.stderr.on("data",function(data) {
 		data = data.toString();
+		buffer += data;
 		if (data.match(/^frame=/i)) {
 			
 			var components = data.match(/([a-z0-9]+)=\s*([0-9\.kmgptb]+)\s*/ig);
@@ -118,11 +118,13 @@ NJob.prototype.run = function() {
 	
 	ffmpeg.on("exit",function(code) {
 		if (code === 0) {
-			self.emit("complete");
 			self.status = self.JOB_COMPLETE;
+			self.emit("complete");
 		} else {
-			self.emit("error");
+			var deathMessage = buffer.substr(buffer.trim().lastIndexOf("\n")+1);
+			
 			self.status = self.JOB_ERROR;
+			self.emit("error",deathMessage,code);
 		}
 	});
 	

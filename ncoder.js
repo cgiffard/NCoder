@@ -71,6 +71,9 @@ NCoder.prototype.h264 = function(infile,outfile,options) {
 	return this.addJob(infile,outfile,parameters);
 };
 
+// Synonyms...
+NCoder.prototype.mp4 = NCoder.prototype.h264;
+
 NCoder.prototype.ogv = function(infile,outfile,options) {
 	options = options && options instanceof Object ? options : {};
 	
@@ -104,16 +107,31 @@ NCoder.prototype.ogv = function(infile,outfile,options) {
 NCoder.prototype.webm = function(infile,outfile,options) {
 	options = options && options instanceof Object ? options : {};
 	
-	return job;
+	if (!infile	) throw new Error("An input file must be provided.");
+	if (!outfile) throw new Error("An output file must be provided.");
+	
+	var audioBitRate		= options.audioBitRate		|| "128k",
+		audioSampleRate		= options.audioSampleRate	|| "44100",
+		videoWidth			= options.videoWidth		|| 640,
+		videoHeight			= options.videoHeight		|| 360,
+		videoBitRate		= options.videoBitRate		|| "1024k",
+		videoFrameRate		= options.videoFrameRate	|| 30;
+	
+	//ffmpeg -i exampleinput.mp4
+	// -acodec libvorbis -ab 128k -ar 44100
+	// -vcodec libvpx -s 640x360 -r 30 -vb 1024k ./test.webm
+	
+	var parameters = [
+		"-acodec",	"libvorbis",
+		"-ab",		audioBitRate,
+		"-ar",		audioSampleRate,
+		"-vcodec",	"libvpx",
+		"-s",		videoWidth + "x" + videoHeight,
+		"-vb",		videoBitRate,
+		"-r",		videoFrameRate
+	];
+	
+	return this.addJob(infile,outfile,parameters);
 };
-
-
-// Kill all running ffmpeg instances if we die...
-//process.on("uncaughtException",function() {
-//	console.log(childProcess);
-//	console.log(process);
-//	console.log(process.mainModule.children);
-//	process.exit();
-//});
 
 module.exports = NCoder;

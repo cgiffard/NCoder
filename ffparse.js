@@ -181,8 +181,8 @@ FFParser.prototype.parseLine = function(lineData) {
 				self.status = FF_BUILDINFO;
 				
 			} else {
-				console.log("UNEXPECTED ERROR",self.status);
-				console.log(origData);
+				// console.log("UNEXPECTED ERROR",self.status);
+				// console.log(origData);
 				return;
 			}
 			
@@ -196,8 +196,8 @@ FFParser.prototype.parseLine = function(lineData) {
 			// If we've got an unexpected procedure name and the line isn't blank
 			} else if ((procedureName+lineData).replace(/\s+/ig,"").length) {
 				
-				console.log("UNEXPECTED ERROR",self.status);
-				console.log(origData);
+				// console.log("UNEXPECTED ERROR",self.status);
+				// console.log(origData);
 				return;
 			}
 			
@@ -228,8 +228,8 @@ FFParser.prototype.parseLine = function(lineData) {
 			
 			// If we've got an unexpected procedure name and the line isn't blank
 			} else if ((procedureName+lineData).replace(/\s+/g,"").length) {
-				console.log("UNEXPECTED ERROR",self.status);
-				console.log(origData);
+				// console.log("UNEXPECTED ERROR",self.status);
+				// console.log(origData);
 				return;
 			}
 			
@@ -242,8 +242,8 @@ FFParser.prototype.parseLine = function(lineData) {
 			
 			// If we've got an unexpected procedure name and the line isn't blank
 			} else if ((procedureName+lineData).replace(/\s+/ig,"").length) {
-				console.log("UNEXPECTED ERROR",self.status);
-				console.log(origData);
+				// console.log("UNEXPECTED ERROR",self.status);
+				// console.log(origData);
 				return;
 			}
 			
@@ -358,7 +358,7 @@ function FFStream(initData) {
 		initData.match(/\s*#\d:(\d+)(\(([a-zA-Z\-]+)\))\:\s*(Video|Audio)\s*:\s*(.*)/);
 	
 	if (!initParts) {
-		console.log(initData);
+		// console.log(initData);
 		throw new Error("Invalid stream initialisation string!");
 	}
 	

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var NCoder = require("./");
+var NCoder = require("../");
 	myEnc = new NCoder();
 
 
