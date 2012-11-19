@@ -115,6 +115,11 @@ FFParser.prototype.parseLine = function(lineData) {
 		return;
 	}
 	
+	// Is this a blank line? Chuck it out!
+	if (lineData.match(/^\s*$/ig)) {
+		return;
+	}
+	
 	if (lineData.match(/^\s*Output\s*#\d+,/i)) {
 		self.status = FF_OUTPUTWAITING;
 	}
@@ -160,10 +165,12 @@ FFParser.prototype.parseLine = function(lineData) {
 			
 		case FF_BUILDINFO:
 		
-			if (lineData.length === 0 || lineData.match(/^\s+$/))
-				self.status = FF_INFOWAITING;
+			if (!procedureName === "Input") {
+				break;
+			}
 			
-			break;
+			self.status = FF_INFOWAITING;
+			// deliberately fall through!
 		
 		case FF_INFOWAITING:
 		

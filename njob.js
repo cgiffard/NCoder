@@ -31,7 +31,7 @@ var NJob = function NJob(input,output,parameters) {
 	
 	// Try and extract metadata about file...
 	self.ncoder.metadata(input,function(data) {
-		var duration = 0,
+		var duration = 0.1,
 			fps = 30;
 		
 		// Sucks. Rewrite
@@ -109,6 +109,8 @@ NJob.prototype.run = function() {
 			// Now work out how far through the file we are.
 			var totalFrames = self.duration * self.fps;
 			self.percentComplete = (progressData.frame / totalFrames)*100;
+			self.percentComplete
+				= self.percentComplete >= 100 ? 100 : self.percentComplete;
 			
 			progressData.percentComplete = self.percentComplete;
 			
@@ -127,7 +129,6 @@ NJob.prototype.run = function() {
 			self.emit("error",deathMessage,code);
 		}
 	});
-	
 	
 	process.on("exit",function() {
 		ffmpeg.kill();

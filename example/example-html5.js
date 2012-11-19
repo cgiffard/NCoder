@@ -76,7 +76,6 @@ function runEncode(maxResolution,callback) {
 		previousPerc = 0;
 	
 	ncoder.queue.on("progress",function(data) {
-		console.log(data);
 		floorPerc = Math.floor(data.percentComplete*10);
 	
 		while (floorPerc > previousPerc) {
@@ -88,6 +87,11 @@ function runEncode(maxResolution,callback) {
 	ncoder.queue.on("complete",function() {
 		console.log("Queue Complete");
 	});
+	
+	console.log(
+		"Processing %d jobs to a maximum resolution of %dp.",
+		ncoder.queue.length,
+		maxResolution);
 	
 	ncoder.queue.run();
 }
