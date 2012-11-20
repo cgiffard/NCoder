@@ -144,7 +144,9 @@ FFParser.prototype.parseLine = function(lineData) {
 							lineData.match(/\:/g)) {
 		
 		procedureName = procedureData[1];
-		lineData = lineData.substr(procedureName.length);
+		
+		if (self.status > FF_BUILDINFO)
+			lineData = lineData.substr(procedureName.length);
 	}
 	
 	if (indentation < self._previousIndentation) {
@@ -168,7 +170,7 @@ FFParser.prototype.parseLine = function(lineData) {
 			
 		case FF_BUILDINFO:
 		
-			if (!procedureName === "Input") {
+			if (procedureName !== "Input") {
 				break;
 			}
 			
@@ -365,7 +367,7 @@ function FFStream(initData) {
 	self.metadata			= {};
 	
 	var initParts =
-		initData.match(/\s*#\d:(\d+)(\(([a-zA-Z\-]+)\))\:\s*(Video|Audio)\s*:\s*(.*)/);
+		initData.match(/\s*#\d[:\.](\d+)(\(([a-zA-Z\-]+)\))\:\s*(Video|Audio)\s*:\s*(.*)/);
 	
 	if (!initParts) {
 		// console.log(initData);
