@@ -115,8 +115,11 @@ FFParser.prototype.parseLine = function(lineData) {
 		return;
 	}
 	
-	// Is this a blank line? Chuck it out!
-	if (lineData.match(/^\s*$/ig)) {
+	// Is this a blank or other form of garbage line? Chuck it out!
+	if (lineData.match(/^\s*$/ig) ||
+		lineData.match(/\*\*\*/ig) ||
+		lineData.match(/This program is only/g)) {
+		
 		return;
 	}
 	
