@@ -4,7 +4,7 @@ var NCoder = require("../");
 	myEnc = new NCoder();
 
 
-var myFile = "/Users/cgiffard/Development/Projects/Vixen/30707792.mp4";
+var myFile = process.argv.pop();
 
 myEnc.metadata(myFile,function(metadata) {
 	

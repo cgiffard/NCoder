@@ -5,7 +5,7 @@ var NCoder		= require("../"),
 	ncoder		= new NCoder(),
 	barText		= "Encoding [:bar] :percent :elapseds elapsed/:etas remaining";
 
-var myFile = "/Users/cgiffard/Development/Projects/Vixen/30707792.mp4";
+var myFile = process.argv.pop();
 
 var encodeSettings = {
 	

@@ -6,7 +6,7 @@ var NCoder = require("../"),
 	progressBar = new ProgressBar('Encoding [:bar] :percent :elapseds elapsed/:etas remaining', { total: 1000, width: 50 });
 
 
-var myFile = "/Users/cgiffard/Development/Projects/Vixen/30707792.mp4",
+var myFile = process.argv.pop(),
 	myOutput = "./out.webm";
 
 var job =
