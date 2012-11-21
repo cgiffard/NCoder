@@ -12,7 +12,7 @@ var workers = [];
 
 // Use 
 var NCoder = function NCoder(simultaneity) {
-	simultaneity = simultaneity ? simultaneity : threadCount;
+	this.simultaneity = simultaneity ? simultaneity : threadCount;
 	this.queue = new NQueue(this);
 };
 
@@ -68,6 +68,10 @@ NCoder.prototype.h264 = function(infile,outfile,options) {
 		"-r",		videoFrameRate
 	];
 	
+	if (this.simultaneity > 1) {
+		parameters.push("-threads",this.simultaneity);
+	}
+	
 	return this.addJob(infile,outfile,parameters);
 };
 
@@ -101,6 +105,10 @@ NCoder.prototype.ogv = function(infile,outfile,options) {
 		"-r",		videoFrameRate
 	];
 	
+	if (this.simultaneity > 1) {
+		parameters.push("-threads",this.simultaneity);
+	}
+	
 	return this.addJob(infile,outfile,parameters);
 };
 
@@ -130,6 +138,10 @@ NCoder.prototype.webm = function(infile,outfile,options) {
 		"-vb",		videoBitRate,
 		"-r",		videoFrameRate
 	];
+	
+	if (this.simultaneity > 1) {
+		parameters.push("-threads",this.simultaneity);
+	}
 	
 	return this.addJob(infile,outfile,parameters);
 };

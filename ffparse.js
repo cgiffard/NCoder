@@ -74,8 +74,8 @@ FFParser.prototype.parse = function(data) {
 	data = data.toString();
 	
 	var self			= this,
-		endsWithNewline	= data.match(/[\r\n]$/),
-		lines			= data.split(/[\r\n]/ig);
+		endsWithNewline	= data.match(/\n$/),
+		lines			= data.split(/\n/ig);
 	
 	// If there's something in the output buffer, prepend it to the first line.
 	if (self._outputBuffer.length) {
