@@ -367,7 +367,7 @@ function FFStream(initData) {
 	self.metadata			= {};
 	
 	var initParts =
-		initData.match(/\s*#\d[:\.](\d+)(\(([a-zA-Z\-]+)\))\:\s*(Video|Audio)\s*:\s*(.*)/);
+		initData.match(/\s*#\d[:\.](\d+)(\(([a-zA-Z\-]+)\))\:\s*(Video|Audio|Data)\s*:\s*(.*)/);
 	
 	if (!initParts) {
 		// console.log(initData);
