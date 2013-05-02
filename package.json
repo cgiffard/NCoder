@@ -1,6 +1,6 @@
 {
   "name": "ncoder",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Simple node wrapper for ffmpeg.",
   "main": "index.js",
   "scripts": {
