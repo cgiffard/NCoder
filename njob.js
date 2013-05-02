@@ -3,6 +3,7 @@
 var NCoder			= require("./ncoder.js"),
 	NQueue			= require("./nqueue.js"),
 	EventEmitter	= require("events").EventEmitter,
+	util			= require("util"),
 	childProcess	= require("child_process"),
 	spawn			= childProcess.spawn;
 
@@ -59,7 +60,7 @@ var NJob = function NJob(input,output,parameters) {
 	});
 };
 
-NJob.prototype = new EventEmitter();
+util.inherits(NJob,EventEmitter);
 
 NJob.prototype.run = function() {
 	var ffmpeg, self = this;

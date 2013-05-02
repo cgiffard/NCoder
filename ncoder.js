@@ -1,4 +1,5 @@
 var EventEmitter	= require("events").EventEmitter,
+	util			= require("util"),
 	childProcess	= require("child_process"),
 	spawn			= childProcess.spawn,
 	threadCount		= require('os').cpus().length,
@@ -16,7 +17,7 @@ var NCoder = function NCoder(simultaneity) {
 	this.queue = new NQueue(this);
 };
 
-NCoder.prototype = new EventEmitter();
+util.inherits(NCoder,EventEmitter);
 
 NCoder.prototype.addJob = function(infile,outfile,parameters) {
 	
@@ -36,6 +37,7 @@ NCoder.prototype.metadata = function(infile,callback) {
 		parser = new FFParser(ffmpeg);
 	
 	parser.on("parsecomplete",function() {
+		console.log("PARSECOMPLETE");
 		callback(parser);
 	});
 };

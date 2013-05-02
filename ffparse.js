@@ -1,6 +1,7 @@
 // Little parser for FFMpeg
-var fs = require("fs");
-var EventEmitter = require("events").EventEmitter;
+var EventEmitter	= require("events").EventEmitter,
+	fs				= require("fs"),
+	util			= require("util");
 
 const	FF_UNINITIALISED	= 0,
 		FF_BUILDINFO		= 1,
@@ -66,7 +67,7 @@ var FFParser = function(ffchild) {
 };
 
 // Emit events!
-FFParser.prototype = new EventEmitter;
+util.inherits(FFParser,EventEmitter);
 
 // Split input, buffer by line.
 // Then call parse on each line.
